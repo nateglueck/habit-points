@@ -272,6 +272,8 @@ function showSignedIn(user) {
   $("auth").hidden = !!user;
   $("app").hidden = !user;
   $("signOut").hidden = !user;
+  $("changePassword").hidden = !user;
+  if (!user) $("passwordCard").hidden = true;
   // Deferred: awaiting Supabase calls inside onAuthStateChange can deadlock its auth lock.
   if (user && changed) setTimeout(() => load().catch(() => {}));
 }
@@ -289,6 +291,31 @@ $("signUp").addEventListener("click", async () => {
 
 $("signOut").addEventListener("click", () => db.auth.signOut());
 
+$("forgotPassword").addEventListener("click", async () => {
+  if (!$("email").reportValidity()) return;
+  // The emailed link signs the person in and lands back here as a PASSWORD_RECOVERY event.
+  const redirectTo = location.origin + location.pathname;
+  const sent = await run(db.auth.resetPasswordForEmail($("email").value, { redirectTo })).catch(() => null);
+  if (sent) setStatus("Check your email for a link to set a new password.");
+});
+
+const showPasswordForm = (show) => {
+  $("passwordCard").hidden = !show;
+  if (show) $("newPassword").focus();
+};
+
+$("changePassword").addEventListener("click", () => showPasswordForm(true));
+$("cancelPassword").addEventListener("click", () => showPasswordForm(false));
+
+$("passwordForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const saved = await run(db.auth.updateUser({ password: $("newPassword").value })).catch(() => null);
+  if (!saved) return;
+  e.target.reset();
+  showPasswordForm(false);
+  setStatus("Password changed.");
+});
+
 $("spendForm").addEventListener("submit", (e) => {
   e.preventDefault();
   spend(Number($("spendEuros").value), $("spendNote").value.trim()).catch(() => {});
@@ -304,4 +331,7 @@ document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible" && state.user) render();
 });
 
-db.auth.onAuthStateChange((_event, session) => showSignedIn(session?.user ?? null));
+db.auth.onAuthStateChange((event, session) => {
+  showSignedIn(session?.user ?? null);
+  if (event === "PASSWORD_RECOVERY") showPasswordForm(true);
+});
