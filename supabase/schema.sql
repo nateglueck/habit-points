@@ -39,6 +39,10 @@ create index on public.habits (user_id);
 create index on public.completions (user_id, earned_at);
 create index on public.spends (user_id, spent_at);
 
+-- Newer Supabase projects don't expose new tables to the API automatically.
+-- Signed-in users get table access; the policies below narrow it to their own rows.
+grant select, insert, update, delete on public.habits, public.completions, public.spends to authenticated;
+
 alter table public.habits      enable row level security;
 alter table public.completions enable row level security;
 alter table public.spends      enable row level security;
