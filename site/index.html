@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Habit Points</title>
+<meta name="description" content="Earn points for habits, turn them into euros.">
+<meta name="theme-color" content="#12151a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>Habit Points</h1>
+  <button id="signOut" type="button" class="link" hidden>Sign out</button>
+</header>
+
+<main>
+  <section id="auth" class="card" hidden>
+    <h2>Sign in</h2>
+    <form id="authForm">
+      <input id="email" type="email" placeholder="Email" autocomplete="email" required>
+      <input id="password" type="password" placeholder="Password (min. 6 characters)"
+             autocomplete="current-password" minlength="6" required>
+      <div class="row">
+        <button type="submit" class="primary">Sign in</button>
+        <button id="signUp" type="button">Create account</button>
+      </div>
+    </form>
+  </section>
+
+  <div id="app" hidden>
+    <section class="card summary">
+      <div class="stat">
+        <span id="points" class="big">0</span>
+        <span class="muted">active points</span>
+      </div>
+      <div class="stat">
+        <span id="euros" class="big">€0</span>
+        <span class="muted">to spend</span>
+      </div>
+      <div class="gate">
+        <div class="bar"><div id="gateFill"></div></div>
+        <p id="gateText"></p>
+      </div>
+      <p id="expiry" class="muted"></p>
+    </section>
+
+    <section class="card">
+      <h2>Today</h2>
+      <ul id="habits" class="habits"></ul>
+    </section>
+
+    <section class="card">
+      <h2>Spend</h2>
+      <form id="spendForm" class="row">
+        <label class="euro-input">€ <input id="spendEuros" type="number" min="1" step="1" value="1" inputmode="numeric"></label>
+        <input id="spendNote" type="text" placeholder="What for? (optional)" maxlength="120">
+        <button id="spendBtn" type="submit" class="primary">Spend</button>
+      </form>
+      <p id="spendHint" class="muted"></p>
+    </section>
+
+    <section class="card">
+      <h2>History</h2>
+      <ul id="history" class="history"></ul>
+    </section>
+
+    <details class="card">
+      <summary>Manage habits</summary>
+      <ul id="manage" class="manage"></ul>
+      <form id="addHabit" class="habit-form">
+        <input name="name" type="text" placeholder="New habit" maxlength="60" required>
+        <label>pts <input name="points" type="number" min="1" max="100" value="3" required></label>
+        <label><input name="max_count" type="number" min="1" max="50" value="1" required>×
+          <select name="period">
+            <option value="day" selected>per day</option>
+            <option value="week">per week</option>
+            <option value="month">per month</option>
+          </select>
+        </label>
+        <button type="submit">Add</button>
+      </form>
+    </details>
+  </div>
+
+  <p id="status" class="status" role="status"></p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="ledger.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
